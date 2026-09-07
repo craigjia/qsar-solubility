@@ -9,7 +9,7 @@ A simple machine-learning project for predicting aqueous solubility from molecul
 - NumPy
 - RDKit
 - scikit-learn
-
+- Matplotlib
 ## Workflow
 
 1. Load molecular solubility data from CSV
