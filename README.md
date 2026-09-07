@@ -25,7 +25,8 @@ SMILES → RDKit → Molecular Descriptors → Random Forest →Solubility Predi
 ## Project Structure
 
 - `qsar.py` - main QSAR program
-- `solubility.csv` - input dataset
+-`https://raw.githubusercontent.com/PatWalters/solubility/master/delaney.csv"
+` - input dataset 1144 molecules
 - `requirements.txt` - Python dependencies
 
 ## Example
@@ -39,11 +40,12 @@ python qsar.py
 ## Molecular Descriptors
 
 Five RDKit molecular descriptors are calculated from SMILES:
-Molecular Weight (MolWt)
-LogP
-Topological Polar Surface Area (TPSA)
-Hydrogen Bond Donors (HBD)
-Hydrogen Bond Acceptors (HBA)
+
+- Molecular Weight (MolWt)
+- LogP
+- Topological Polar Surface Area (TPSA)
+- Hydrogen Bond Donors (HBD)
+- Hydrogen Bond Acceptors (HBA)
 
 ## Machine Learning Model
 
@@ -51,9 +53,9 @@ A Random Forest Regressor from scikit-learn is used to predict measured log solu
 
 The data are divided into:
 
-80% training set
+- 80% training set
 
-20% test set
+- 20% test set
 
 A fixed random seed (random_state=42) 
 is used for reproducibility.
@@ -62,8 +64,8 @@ is used for reproducibility.
 
 On the held-out test set:
 
-RMSE: ~0.62
+- RMSE: ~0.67
 
-R²: ~0.93
+- R²: ~0.894
 
 These results are based on a single random train/test split and should not be interpreted as a robust estimate of generalization performance.
