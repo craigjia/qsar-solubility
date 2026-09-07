@@ -1,0 +1,22 @@
+Dataset shape: (1144, 4)
+Valid molecules: 1144
+Feature matrix: (1144, 5)
+Training set: (915, 5)
+Test set: (229, 5)
+Model trained!
+
+Model Performance
+-----------------
+RMSE: 0.670
+R²:   0.897
+
+Feature Importance
+------------------
+LogP     0.820482
+MolWt    0.115079
+TPSA     0.040987
+HBA      0.014431
+HBD      0.009021
+dtype: float64
+
+Figure saved as measured_vs_predicted.png
