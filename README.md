@@ -10,7 +10,10 @@ A simple machine-learning project for predicting aqueous solubility from molecul
 - RDKit
 - scikit-learn
 - Matplotlib
+- 
 ## Workflow
+
+SMILES → RDKit → Molecular Descriptors → Random Forest →Solubility Prediction
 
 1. Load molecular solubility data from CSV
 2. Convert SMILES strings into molecular descriptors using RDKit
