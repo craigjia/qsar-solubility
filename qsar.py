@@ -14,7 +14,11 @@ from sklearn.metrics import mean_squared_error, r2_score
 # 1. Load dataset
 # ============================================================
 
-df = pd.read_csv("solubility.csv")
+#df = pd.read_csv("solubility.csv")
+
+url2 = "https://raw.githubusercontent.com/PatWalters/solubility/master/delaney.csv"
+df = pd.read_csv(url2)
+
 
 print("Dataset shape:", df.shape)
 
