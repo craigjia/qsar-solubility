@@ -43,7 +43,7 @@ Topological Polar Surface Area (TPSA)
 Hydrogen Bond Donors (HBD)
 Hydrogen Bond Acceptors (HBA)
 
-##Machine Learning Model
+## Machine Learning Model
 
 A Random Forest Regressor from scikit-learn is used to predict measured log solubility.
 The data are divided into:
