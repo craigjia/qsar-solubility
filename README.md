@@ -64,8 +64,8 @@ is used for reproducibility.
 
 On the held-out test set:
 
-- RMSE: ~0.67
+- RMSE: ~0.64
 
-- R²: ~0.894
+- R²: ~0.897
 
 These results are based on a single random train/test split and should not be interpreted as a robust estimate of generalization performance.
