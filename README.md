@@ -36,6 +36,7 @@ Run:
 python qsar.py
 
 ## Molecular Descriptors
+
 Five RDKit molecular descriptors are calculated from SMILES:
 Molecular Weight (MolWt)
 LogP
