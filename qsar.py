@@ -1,82 +1,72 @@
-# qsar_solubility.py
-
-import pandas as pd
 import numpy as np
-import joblib
+import pandas as pd
+import matplotlib.pyplot as plt
 
 from rdkit import Chem
-from rdkit.Chem import AllChem
+from rdkit.Chem import Descriptors
 
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import (
-    r2_score,
-    mean_squared_error,
-    mean_absolute_error
-)
+from sklearn.metrics import mean_squared_error, r2_score
 
 
-# ==========================================
-# 1. Read CSV
-# ==========================================
+# ============================================================
+# 1. Load dataset
+# ============================================================
 
 df = pd.read_csv("solubility.csv")
 
-print("Original data shape:", df.shape)
+print("Dataset shape:", df.shape)
 
 
-# ==========================================
-# 2. Remove missing values
-# ==========================================
+# ============================================================
+# 2. Convert SMILES to RDKit molecules
+# ============================================================
 
-df = df.dropna(subset=["smiles", "logS"])
+mols = df["SMILES"].apply(Chem.MolFromSmiles)
 
-print("After removing missing values:", df.shape)
+# Remove molecules whose SMILES cannot be parsed
+valid = ~mols.isna()
 
+mols_valid = mols[valid]
 
-# ==========================================
-# 3. SMILES -> RDKit Mol
-# ==========================================
+y = df.loc[
+    valid,
+    "measured log(solubility:mol/L)"
+]
 
-df["mol"] = df["smiles"].apply(Chem.MolFromSmiles)
-
-# Remove invalid SMILES
-df = df[df["mol"].notna()].copy()
-
-print("After removing invalid SMILES:", df.shape)
+print("Valid molecules:", len(mols_valid))
 
 
-# ==========================================
-# 4. Morgan fingerprint function
-# ==========================================
+# ============================================================
+# 3. Calculate molecular descriptors
+# ============================================================
 
-def make_fingerprint(mol):
-    return AllChem.GetMorganFingerprintAsBitVect(
-        mol,
-        radius=2,
-        nBits=2048
-    )
-
-
-# Generate fingerprints
-fps = df["mol"].apply(make_fingerprint)
+molwt = mols_valid.apply(Descriptors.MolWt)
+logp = mols_valid.apply(Descriptors.MolLogP)
+tpsa = mols_valid.apply(Descriptors.TPSA)
+hbd = mols_valid.apply(Descriptors.NumHDonors)
+hba = mols_valid.apply(Descriptors.NumHAcceptors)
 
 
-# ==========================================
-# 5. Fingerprints -> X
-# ==========================================
+# ============================================================
+# 4. Build feature matrix X
+# ============================================================
 
-X = np.array([np.array(fp) for fp in fps])
+X = pd.DataFrame({
+    "MolWt": molwt,
+    "LogP": logp,
+    "TPSA": tpsa,
+    "HBD": hbd,
+    "HBA": hba
+})
 
-y = df["logS"].values
-
-print("X shape:", X.shape)
-print("y shape:", y.shape)
+print("Feature matrix:", X.shape)
 
 
-# ==========================================
-# 6. Train/Test split
-# ==========================================
+# ============================================================
+# 5. Train / test split
+# ============================================================
 
 X_train, X_test, y_train, y_test = train_test_split(
     X,
@@ -85,87 +75,86 @@ X_train, X_test, y_train, y_test = train_test_split(
     random_state=42
 )
 
-print("Training samples:", len(X_train))
-print("Test samples:", len(X_test))
+print("Training set:", X_train.shape)
+print("Test set:", X_test.shape)
 
 
-# ==========================================
-# 7. Create Random Forest model
-# ==========================================
+# ============================================================
+# 6. Train Random Forest model
+# ============================================================
 
 model = RandomForestRegressor(
     n_estimators=200,
     random_state=42
 )
 
-
-# ==========================================
-# 8. Train model
-# ==========================================
-
 model.fit(X_train, y_train)
 
-
-# ==========================================
-# 9. Predictions
-# ==========================================
-
-y_train_pred = model.predict(X_train)
-y_test_pred = model.predict(X_test)
+print("Model trained!")
 
 
-# ==========================================
-# 10. Calculate metrics
-# ==========================================
+# ============================================================
+# 7. Predict test set
+# ============================================================
 
-train_r2 = r2_score(y_train, y_train_pred)
-test_r2 = r2_score(y_test, y_test_pred)
+y_pred = model.predict(X_test)
 
-test_rmse = np.sqrt(
-    mean_squared_error(y_test, y_test_pred)
+
+# ============================================================
+# 8. Evaluate model
+# ============================================================
+
+rmse = np.sqrt(
+    mean_squared_error(y_test, y_pred)
 )
 
-test_mae = mean_absolute_error(
-    y_test,
-    y_test_pred
+r2 = r2_score(y_test, y_pred)
+
+print("\nModel Performance")
+print("-----------------")
+print(f"RMSE: {rmse:.3f}")
+print(f"R²:   {r2:.3f}")
+
+
+# ============================================================
+# 9. Feature importance
+# ============================================================
+
+importance = pd.Series(
+    model.feature_importances_,
+    index=X.columns
+).sort_values(ascending=False)
+
+print("\nFeature Importance")
+print("------------------")
+print(importance)
+
+
+# ============================================================
+# 10. Plot measured vs predicted
+# ============================================================
+
+plt.figure(figsize=(6, 6))
+
+plt.scatter(y_test, y_pred)
+
+plt.plot(
+    [y_test.min(), y_test.max()],
+    [y_test.min(), y_test.max()]
 )
 
+plt.xlabel("Measured logS")
+plt.ylabel("Predicted logS")
+plt.title("Measured vs Predicted Solubility")
 
-print("\n===== Model Performance =====")
+plt.tight_layout()
 
-print("Train R² :", round(train_r2, 3))
-print("Test R²  :", round(test_r2, 3))
-print("Test RMSE:", round(test_rmse, 3))
-print("Test MAE :", round(test_mae, 3))
+plt.savefig(
+    "measured_vs_predicted.png",
+    dpi=300,
+    bbox_inches="tight"
+)
 
+plt.show()
 
-# ==========================================
-# 11. Predict a new molecule
-# ==========================================
-
-new_smiles = "CCOC(=O)C"
-
-new_mol = Chem.MolFromSmiles(new_smiles)
-
-if new_mol is None:
-    raise ValueError("Invalid SMILES for new molecule.")
-
-new_fp = make_fingerprint(new_mol)
-
-X_new = np.array(new_fp).reshape(1, -1)
-
-predicted_logS = model.predict(X_new)[0]
-
-print("\n===== New Molecule Prediction =====")
-
-print("SMILES:", new_smiles)
-print("Predicted logS:", round(predicted_logS, 3))
-
-
-# ==========================================
-# 12. Save model
-# ==========================================
-
-joblib.dump(model, "solubility_rf.pkl")
-
-print("\nModel saved as: solubility_rf.pkl")
+print("\nFigure saved as measured_vs_predicted.png")
