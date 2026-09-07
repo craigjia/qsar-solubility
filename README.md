@@ -25,7 +25,8 @@ SMILES → RDKit → Molecular Descriptors → Random Forest →Solubility Predi
 ## Project Structure
 
 - `qsar.py` - main QSAR program
--`https://raw.githubusercontent.com/PatWalters/solubility/master/delaney.csv"
+- 
+-`＄https://raw.githubusercontent.com/PatWalters/solubility/master/delaney.csv"
 ` - input dataset 1144 molecules
 - `requirements.txt` - Python dependencies
 
