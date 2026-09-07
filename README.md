@@ -64,7 +64,7 @@ is used for reproducibility.
 
 On the held-out test set:
 
-- RMSE: ~0.64
+- RMSE: ~0.67
 
 - R²: ~0.897
 
