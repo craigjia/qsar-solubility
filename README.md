@@ -34,6 +34,7 @@ Run:
 
 ```bash
 python qsar.py
+```
 
 ## Molecular Descriptors
 
