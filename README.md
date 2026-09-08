@@ -68,4 +68,18 @@ On the held-out test set:
 
 - R²: ~0.897
 
-These results are based on a single random train/test split and should not be interpreted as a robust estimate of generalization performance.
+## Limitations & Notes
+
+
+- This demo uses a single 80/20 random split with  random_state=42  for illustration purposes only. A single random split is not sufficient for rigorous model evaluation or generalization claims. In a real-world setting, proper validation would require:
+
+- k-fold cross-validation (e.g., 5-fold or 10-fold) to assess stability across data splits
+
+- External test set — a held-out dataset not seen during any stage of feature selection or hyperparameter tuning
+
+- Scaffold split (by Bemis–Murcko scaffold) to ensure structurally distinct molecules in train vs. test, preventing data leakage from similar compounds appearing in both sets
+
+- Hyperparameter tuning via grid search or randomized search (e.g.,  GridSearchCV ) rather than default  n_estimators=100 
+
+The current R² ≈ 0.90 and RMSE ≈ 0.67 should be interpreted as a proof of concept, not as a production-ready model.
+
